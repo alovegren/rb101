@@ -31,11 +31,13 @@ UUID_SEQUENCE = [8, 4, 4, 4, 12]
 
 def uuid
   uuid_array = []
+
   UUID_SEQUENCE.each do |section_number|
     subsection = ''
     section_number.times { |i| subsection << HEX.sample }
     uuid_array << subsection
   end
+  
   uuid_array.join('-')
 end
 
