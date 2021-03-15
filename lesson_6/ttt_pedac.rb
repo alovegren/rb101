@@ -112,3 +112,60 @@
 # b) We can make one more improvement: pick square #5 if it's available. The AI for the computer should go like this: first, pick the winning move; then, defend; then pick square #5; then pick a random square.
 
 # Within determine_computer_piece, we just need to add another branch to the conditional following invocations of both find_offensive_square and find_at_risk square. If the computer move is a falsey value AND square 5 is empty, pick square 5. If only the computer move is a falsey value, pick a random square.
+
+# c) Can you change the game so that the computer moves first? Can you make this a setting at the top (i.e. a constant), so that you could play the game with either player or computer going first? Can you make it so that if the constant is set to "choose", then your game will prompt the user to determine who goes first? Valid options for the constant can be "player", "computer", or "choose".
+
+# # Problem
+# Create a setting for our tic tac toe game so that first and second players can be chosen (rather than the user always going first) 
+
+# Rules
+# - The setting should be in the form of a constant at the top of the program
+# - If the 'player' setting is active, the player will have the first move
+# - If the 'computer' setting is active, the computer will have the first move
+# - If the 'choose' setting is active, the user will be prompted to chose player or computer
+
+# # Algorithm
+# - Initialize a constant for the setting to reference a symbol for the choose setting
+# - If the setting is set to choose, prompt the user for a choice
+#   - Only before a match
+#   - Validate input
+# - Within the play loop, adjust the order of the play based on the setting
+#   - We can define a method, and pass in the player_places_piece! and computer_places_piece! methods in the correct order, along with the board 
+#     - Create a hash with 'user' and 'computer' as keys, and their respective methods (in symbol form) to place a piece as values.
+#     - Define a method with two parameters: the player hash and the board
+#       - Display the board
+#       - Call the first player's method
+#       - Break if someone won or the board is full
+#       - Call the second player's method
+#       - Break if someone won or the board is full
+#     - Display the board
+# - Define the second player as a constant, whose hash key is not the first player's
+# - Call the method written above, referencing the values of the player hash via local first and second player variables
+
+# # # 6. Improve the game loop
+
+# # Problem: There are two new methods there: place_piece! and alternate_player. The place_piece! is a generic method that will know how to place the piece on the board depending on the current_player. That is, it will call player_places_piece! or computer_places_piece! depending on the value of current_player. The trick, then, is to keep track of a current_player, and to switch that variable's value after every turn.
+
+# See if you can build those two methods and make this work.
+
+# # Rules
+# - Modify the current main game loop to contain the following logic:
+#   - Display the board
+#   - Current player places piece (place_piece!)
+#   - Next player places piece (alternate players with alternate_player())
+#   - Break if there is an end condition
+# - place_piece! marks a square based on the current player
+#   - Should alter board's state
+# - alternate_player switches the current player
+#   - Should return a player
+# - The existing display_board(), someone_won? and board_full? methods should be used
+
+# # Algorithm
+# - We can use our current logic of determining a first and second player, but condense those designations down to one variable for a current player.
+# - Delete second player variable
+# - Set current player equal to user's choice for play starts with
+# - Remove second player determination
+# - Write method to place the piece of the current player
+#   - Call the method corresponding to the current player
+# - Write method to alternate players
+#   - Select the player in the player/method hash that is not the current player

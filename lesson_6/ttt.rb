@@ -11,8 +11,9 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
 
 # Play order settings:
 
+PLAYERS = { 'user' => :player_places_piece!,
+            'computer' => :computer_places_piece! }
 PLAY_STARTS_WITH = 'choose'
-SECOND_PLAYER = ''
 
 # # # # # # # # # Method definitions # # # # # # # # #
 
@@ -121,7 +122,15 @@ def computer_places_piece!(brd)
   brd[square] = COMPUTER_MARKER
 end
 
-# # # Detect end of game # # #
+def place_piece!(brd, current_plyr)
+  send(PLAYERS[current_plyr], brd)
+end
+
+def alternate_player(current_plyr)
+  current_plyr = PLAYERS.keys.reject { |player| player == current_plyr }[0]
+end
+
+  # # # Detect end of game # # #
 def board_full?(brd)
   empty_squares(brd).empty?
 end
@@ -147,29 +156,11 @@ def detect_winning_score(comp_score, plyr_score)
   nil
 end
 
-# # # Gameplay loop # # #
-
-def play_in_order(plyrs, brd)
-  loop do
-    display_board(brd)
-
-    send(plyrs[PLAY_STARTS_WITH], brd)
-    break if someone_won?(brd) || board_full?(brd)
-
-    display_board(brd)
-
-    send(plyrs[SECOND_PLAYER], brd)
-    break if someone_won?(brd) || board_full?(brd)
-  end
-end  
-
 # # # # # # # # # Method invocations # # # # # # # # #
 
 # # # Game setup # # #
 computer_score = 0
 player_score = 0
-players = { 'user' => :player_places_piece!,
-            'computer' => :computer_places_piece! }
 
 # # # Define first and second players # # #          
 loop do
@@ -183,11 +174,16 @@ loop do
     prompt "Sorry, that's not a valid input. Please choose 'computer' or 'user'."
   end
 
-  SECOND_PLAYER = players.keys.reject { |player| player == PLAY_STARTS_WITH }[0]
-
   # # # Gameplay loop # # #
 
-  play_in_order(players, board)
+  current_player = PLAY_STARTS_WITH
+
+  loop do
+    display_board(board)
+    place_piece!(board, current_player)
+    current_player = alternate_player(current_player)
+    break if someone_won?(board) || board_full?(board)
+  end
 
   display_board(board)
 
