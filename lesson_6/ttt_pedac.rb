@@ -101,6 +101,14 @@
 # Within the computer places piece method, call the method defined directly above. Set this return value equal to the computer's square.
 # Set the value of the board hash at the key 'square' equal to the computer's marker.
 
-
 # {1=>" ", 2=>" ", 3=>" ", 4=>" ", 5=>" ", 6=>" ", 7=>" ", 8=>" ", 9=>" "} 
 
+# # # 5. Computer Turn Refinements
+
+# a) We actually have the offense and defense steps backwards. In other words, if the computer has a chance to win, it should take that move rather than defend. As we have coded it now, it will defend first. Update the code so that it plays the offensive move first.
+
+# We currently control the offense/defense order simply by calling find_at_risk_square first and find_offensive_square second. We just need to reorder them, being sure to preserve our iterating logic and checks for a nil value referenced by computer_move at the appropriate times.
+
+# b) We can make one more improvement: pick square #5 if it's available. The AI for the computer should go like this: first, pick the winning move; then, defend; then pick square #5; then pick a random square.
+
+# Within determine_computer_piece, we just need to add another branch to the conditional following invocations of both find_offensive_square and find_at_risk square. If the computer move is a falsey value AND square 5 is empty, pick square 5. If only the computer move is a falsey value, pick a random square.
