@@ -88,10 +88,40 @@
 #   - We'll have to do this each time the player draws, so write a method for it
 #   - Reuse the 'joinor' method from TTT to format the message
 
+
 # 3. Player turn: hit or stay
 #   - repeat until bust or "stay"
 # 4. If player bust, dealer wins.
+# - Find the value of an ace
+#   - Create a helper method to output an array with integer values of all cards
+#     - The face value array must be referenced to get the values of face cards 
+#   - The ace will initially be represented by a 1
+#   - Iterate through the values
+#     - For value referencing 1, if the total of the cards array is 11 or less
+#       - Add 10
+#   - Return the array of values of the hand
+# - Write method to determine if a player busted
+#   - Sum the current hand total (use adjust aces method above)
+#   - Return true if the sum is greater than 21
+#   - Otherwise, return false
+# - Create a loop
+#   - Ask player if they want to hit or stay (wrap this in validation)
+#   - Save input
+#   - Break if the player busted or stayed
+#   - Draw a card
+#   - Display hand
+
 # 5. Dealer turn: hit or stay
 #   - repeat until total >= 17
 # 6. If dealer bust, player wins.
+# Begin loop
+# - Break if the dealer's hand busts or the sum of the dealer's hand is greater than 17
+# - Draw a card for the dealer
+# Display the dealer's cards
+
 # 7. Compare cards and declare winner.
+# - Write a method that will return the winner
+#   - Compare the sums of the hands
+#   - Return 'Player' if the player wins
+#   - Return 'Computer' if the computer wins
+#   - Otherwise, return a tie message

@@ -1,12 +1,21 @@
 require "pry"
 
+# # # # # # # # # # # CONSTANTS # # # # # # # # # # #
+
 SUITS = ['spades', 'clubs', 'diamonds', 'hearts']
-FACE_VALUES = { 'jack'=> 10, 'queen'=> 10, 'king'=> 10, 'ace'=> [1, 11] }
+FACE_VALUES = { 'jack' => 10, 'queen' => 10, 'king' => 10, 'ace' => 1 }
 ALL_VALUES = [*2..10, *FACE_VALUES.keys]
 
-# # # # # # # # # # # # METHODS # # # # # # # # # # # # 
+# # # # # # # # # # # # METHODS # # # # # # # # # # # #
+
 def prompt(msg)
-  puts "=====> #{msg}"
+  puts "===> #{msg}"
+end
+
+def emphasized_prompt(msg)
+  puts "
+  =====> #{msg} <=====
+  "
 end
 
 def joinand(arr, punct=', ', word='and')
@@ -27,83 +36,174 @@ def joinand(arr, punct=', ', word='and')
 end
 
 def value_of_suit_format(card)
-  "#{card["value"]} of #{card["suit"]}"
+  "#{card['value']} of #{card['suit']}"
 end
 
 def draw_card(source, hand)
   hand << source.delete(source.sample)
 end
 
-def display_your_hand_message(hand)
+def display_full_hand(hand)
   formatted_cards = hand.map do |card|
-                      value_of_suit_format(card)
-                    end
-  prompt "You have: #{joinand(formatted_cards)}"
+    value_of_suit_format(card)
+  end
+  joinand(formatted_cards)
 end
 
-def display_dealer_hand_message(hand)
-  prompt "The dealer has: #{value_of_suit_format(hand[0])} and an unknown card"
+def display_partial_hand(hand)
+  value_of_suit_format(hand[0])
 end
 
-# # # Initialize deck
+# # # Initialize deck # #
 deck = []
 
 SUITS.each do |suit|
   ALL_VALUES.each do |value|
-    deck << { 'suit'  => suit,
+    deck << { 'suit' => suit,
               'value' => value }
   end
 end
 
-# # # Bust
-
-def bust?(hand)
-  true
-end
-
-def adjust_aces(hand)
-  all_values = hand.map do |card|
-                 if (2..10).include?(card["value"])
-                   card["value"]
-                 else
-                   FACE_VALUES[card["value"]]
-                 end
-               end
-
-  ace_count = all_values.count([1, 11])
-  all_values.delete([1, 11])
-
-  ace_count.times do |_|
-    if all_values.sum < 11
-      all_values << 11
+# # Adjust value of aces to calculate sum of hand # #
+def collect_all_possible_values(hand)
+  hand.map do |card|
+    if (2..10).include?(card['value'])
+      card['value']
     else
-      all_values << 1
+      FACE_VALUES[card['value']]
     end
   end
-  all_values
-end # => An array of integers
-# # # Deal cards to player and dealer
-
-dealer_hand = []
-player_hand = []
-
-2.times { |i| draw_card(deck, dealer_hand)}
-2.times { |i| draw_card(deck, player_hand)}
-
-display_your_hand_message(player_hand)
-display_dealer_hand_message(dealer_hand)
-
-loop do
-  player_move = ''
-
-  loop do
-    prompt "Do you want to 'hit' or 'stay'?"
-    player_move = gets.chomp.downcase
-    break if player_move == 'hit' || player_move == 'stay'
-    prompt "Sorry, that isn't a valid choice. Please type 'hit' or 'stay'."
-  end
-
-  break if bust?(player_hand) || player_move == 'stay'
 end
 
-p adjust_aces(player_hand).sum
+# rubocop: disable Lint/UselessAssignment
+def adjust_hand(hand)
+  all_possible_values = collect_all_possible_values(hand)
+
+  all_possible_values.each do |value|
+    next if value != 1
+    value = 11 if all_possible_values.sum < 11
+  end
+end
+# rubocop: enable Lint/UselessAssignment
+
+# # Check if adjusted hand sum is greater than 21 # #
+def bust?(hand)
+  adjust_hand(hand).sum > 21
+end
+
+# # Declare winner (given neither player busted) # #
+def determine_winner(plyr_hand, dlr_hand)
+  case adjust_hand(plyr_hand).sum <=> adjust_hand(dlr_hand).sum
+  when -1 then 'Dealer'
+  when 0 then 'Tie'
+  when 1 then 'Player'
+  end
+end
+
+def declare_winner(plyr_hand, dlr_hand)
+  winner = determine_winner(plyr_hand, dlr_hand)
+  prompt "#{winner} wins!" if winner != 'Tie'
+  prompt "It's a tie!" if winner == 'Tie'
+end
+
+def display_rules
+  emphasized_prompt "Rules:"
+  prompt "You and the dealer are each dealt two cards at the start of the game."
+  prompt "You can see all of your cards, but only one of the dealer's."
+  prompt "On your turn, you may draw as many cards as you wish."
+  prompt "You want the sum of your hand to be as close as possible to 21..."
+  prompt "WITHOUT exceeding it. If you do, you lose, or 'bust'!"
+  prompt "All cards are worth their standard values (Face cards = 10)..."
+  prompt "Except for the Ace. That is worth 11 points, unless:"
+  prompt "That value would cause you to go over 21."
+  prompt "Example: A + K = 21"
+  prompt "Example: A + K + A = 12"
+  prompt "Example: A + 6 = 17"
+  prompt "If neither player busts, the player with the highest score wins!"
+end
+
+# # # # # # # # # # # GAME LOOP # # # # # # # # # # #
+
+# # Setup # #
+emphasized_prompt "Welcome to Twenty-One!"
+prompt "Do you know the rules? (y or n)"
+knows_rules = ''
+
+loop do
+  knows_rules = gets.chomp.downcase
+  break if knows_rules == 'y' || knows_rules == 'n'
+  prompt "Sorry, what was that? Please answer 'y' or 'n'."
+end
+
+display_rules if knows_rules == 'n'
+
+emphasized_prompt "Let's get started!"
+
+loop do
+  dealer_hand = []
+  player_hand = []
+
+  2.times { |_| draw_card(deck, dealer_hand) }
+  2.times { |_| draw_card(deck, player_hand) }
+
+  prompt "You have: #{display_full_hand(player_hand)}"
+  # rubocop:disable Layout/LineLength
+  prompt "The dealer has: #{display_partial_hand(dealer_hand)} and an unknown card."
+  # rubocop: enable Layout/LineLength
+
+  # # Player's turn # #
+  prompt "Player's turn!"
+
+  loop do
+    player_move = ''
+
+    loop do
+      prompt "Do you want to 'hit' or 'stay'?"
+      player_move = gets.chomp.downcase
+      break if player_move == 'hit' || player_move == 'stay'
+      prompt "Sorry, that isn't a valid choice. Please type 'hit' or 'stay'."
+    end
+
+    break if bust?(player_hand) || player_move == 'stay'
+
+    draw_card(deck, player_hand)
+    prompt "You have: #{display_full_hand(player_hand)}"
+
+    break if bust?(player_hand) || player_move == 'stay'
+  end
+
+  # # Check for player bust, then dealer's turn # #
+  if bust?(player_hand)
+    prompt "You busted! Dealer wins."
+  else
+    prompt "Dealer's turn!"
+
+    until adjust_hand(dealer_hand).sum >= 17
+      prompt "The dealer hits!"
+      draw_card(deck, dealer_hand)
+    end
+
+    # # Check for dealer bust, then compare final hands # #
+    if bust?(dealer_hand)
+      prompt "Dealer busted! You win."
+    else
+      prompt "The dealer stayed."
+      prompt "You have: #{display_full_hand(player_hand)}"
+      prompt "The dealer has: #{display_full_hand(dealer_hand)}"
+
+      declare_winner(player_hand, dealer_hand)
+    end
+  end
+
+  prompt "Do you want to play again? y or n"
+  play_again = gets.chomp.downcase
+  break unless play_again == 'y'
+
+  emphasized_prompt "New Game"
+end
+
+# # Goodbye message # #
+emphasized_prompt "Thanks for playing Twenty-One!"
+
+# Rubocop: Useless Assignment
+# Display player's sum after each draw
