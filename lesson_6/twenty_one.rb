@@ -5,6 +5,8 @@ require "pry"
 SUITS = ['spades', 'clubs', 'diamonds', 'hearts']
 FACE_VALUES = { 'jack' => 10, 'queen' => 10, 'king' => 10, 'ace' => 1 }
 ALL_VALUES = [*2..10, *FACE_VALUES.keys]
+GOAL_VALUE = 21
+DEALER_STOP = GOAL_VALUE - 4
 
 # # # # # # # # # # # # METHODS # # # # # # # # # # # #
 
@@ -88,7 +90,7 @@ end
 
 # # Check if adjusted hand sum is greater than 21 # #
 def bust?(hand)
-  adjust_hand(hand).sum > 21
+  adjust_hand(hand).sum > GOAL_VALUE
 end
 
 
@@ -124,11 +126,11 @@ def display_rules
   prompt "You and the dealer are each dealt two cards at the start of the game."
   prompt "You can see all of your cards, but only one of the dealer's."
   prompt "On your turn, you may draw as many cards as you wish."
-  prompt "You want the sum of your hand to be as close as possible to 21..."
+  prompt "You want the sum of your hand to be as close as possible to 21 (or whatever value we are playing to)..."
   prompt "WITHOUT exceeding it. If you do, you lose, or 'bust'!"
   prompt "All cards are worth their standard values (Face cards = 10)..."
   prompt "Except for the Ace. That is worth 11 points, unless:"
-  prompt "That value would cause you to go over 21."
+  prompt "That value would cause you to go over 21 (or whatever value we are playing to)."
   prompt "Example: A + K = 21"
   prompt "Example: A + K + A = 12"
   prompt "Example: A + 6 = 17"
