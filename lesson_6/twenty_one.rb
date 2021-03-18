@@ -91,17 +91,18 @@ def bust?(hand)
   adjust_hand(hand).sum > 21
 end
 
+
 # # Declare winner (given neither player busted) # #
-def determine_winner(plyr_hand, dlr_hand)
-  case adjust_hand(plyr_hand).sum <=> adjust_hand(dlr_hand).sum
+def determine_winner(plyr_total, dlr_total)
+  case plyr_total <=> dlr_total
   when -1 then 'Dealer'
   when 0 then 'Tie'
   when 1 then 'Player'
   end
 end
 
-def declare_winner(plyr_hand, dlr_hand)
-  winner = determine_winner(plyr_hand, dlr_hand)
+def declare_winner(plyr_total, dlr_total)
+  winner = determine_winner(plyr_total, dlr_total)
   prompt "#{winner} wins!" if winner != 'Tie'
   prompt "It's a tie!" if winner == 'Tie'
 end
@@ -146,7 +147,9 @@ loop do
   2.times { |_| draw_card(deck, dealer_hand) }
   2.times { |_| draw_card(deck, player_hand) }
 
-  prompt "You have: #{display_full_hand(player_hand)}"
+  player_total = adjust_hand(player_hand).sum
+
+  prompt "You have: #{display_full_hand(player_hand)}, for a total of #{player_total}."
   # rubocop:disable Layout/LineLength
   prompt "The dealer has: #{display_partial_hand(dealer_hand)} and an unknown card."
   # rubocop: enable Layout/LineLength
@@ -166,8 +169,11 @@ loop do
 
     break if bust?(player_hand) || player_move == 'stay'
 
+    prompt "You hit!"
     draw_card(deck, player_hand)
-    prompt "You have: #{display_full_hand(player_hand)}"
+
+    player_total = adjust_hand(player_hand).sum
+    prompt "You have: #{display_full_hand(player_hand)}, for a grand total of #{player_total}."
 
     break if bust?(player_hand) || player_move == 'stay'
   end
@@ -176,22 +182,31 @@ loop do
   if bust?(player_hand)
     prompt "You busted! Dealer wins."
   else
+    prompt "You stayed at #{player_total}."
     prompt "Dealer's turn!"
+
+    dealer_total = adjust_hand(dealer_hand).sum
+    prompt "The dealer's total is now #{dealer_total}."
 
     until adjust_hand(dealer_hand).sum >= 17
       prompt "The dealer hits!"
       draw_card(deck, dealer_hand)
+      dealer_total = adjust_hand(dealer_hand).sum
+      prompt "The dealer's total is now #{dealer_total}."
     end
 
     # # Check for dealer bust, then compare final hands # #
     if bust?(dealer_hand)
       prompt "Dealer busted! You win."
     else
+      player_total = adjust_hand(player_hand).sum
+      dealer_total = adjust_hand(dealer_hand).sum
+      
       prompt "The dealer stayed."
-      prompt "You have: #{display_full_hand(player_hand)}"
-      prompt "The dealer has: #{display_full_hand(dealer_hand)}"
+      prompt "You have: #{display_full_hand(player_hand)} for a grand total of #{player_total}."
+      prompt "The dealer has: #{display_full_hand(dealer_hand)} for a grand total of #{dealer_total}."
 
-      declare_winner(player_hand, dealer_hand)
+      declare_winner(player_total, dealer_total)
     end
   end
 
@@ -199,6 +214,7 @@ loop do
   play_again = gets.chomp.downcase
   break unless play_again == 'y'
 
+  system 'clear'
   emphasized_prompt "New Game"
 end
 
