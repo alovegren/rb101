@@ -107,6 +107,18 @@ def declare_winner(plyr_total, dlr_total)
   prompt "It's a tie!" if winner == 'Tie'
 end
 
+def determine_final_winner(plyr_score, dlr_score)
+  case plyr_score <=> dlr_score
+  when -1 then 'Dealer'
+  when 1 then 'Player'
+  end
+end
+
+def declare_final_winner(plyr_score, dlr_score)
+  winner = determine_final_winner(plyr_score, dlr_score)
+  emphasized_prompt "#{winner} wins!"
+end
+
 def display_rules
   emphasized_prompt "Rules:"
   prompt "You and the dealer are each dealt two cards at the start of the game."
@@ -139,6 +151,9 @@ end
 display_rules if knows_rules == 'n'
 
 emphasized_prompt "Let's get started!"
+
+player_score = 0
+dealer_score = 0
 
 loop do
   dealer_hand = []
@@ -206,16 +221,28 @@ loop do
       prompt "You have: #{display_full_hand(player_hand)} for a grand total of #{player_total}."
       prompt "The dealer has: #{display_full_hand(dealer_hand)} for a grand total of #{dealer_total}."
 
+      winner = determine_winner(player_total, dealer_total)
       declare_winner(player_total, dealer_total)
     end
   end
 
-  prompt "Do you want to play again? y or n"
-  play_again = gets.chomp.downcase
-  break unless play_again == 'y'
+  player_score += 1 if winner == 'Player' || bust?(dealer_hand)
+  dealer_score += 1 if winner == 'Dealer' || bust?(player_hand)
 
-  system 'clear'
-  emphasized_prompt "New Game"
+  emphasized_prompt "Your score is #{player_score}."
+  emphasized_prompt "The dealer's score is #{dealer_score}."
+
+  if player_score >= 5 || dealer_score >= 5
+    declare_final_winner(player_score, dealer_score)
+    break
+  else
+    prompt "Do you want to play again? y or n"
+    play_again = gets.chomp.downcase
+    break unless play_again == 'y'
+
+    system 'clear'
+    emphasized_prompt "New Game"
+  end
 end
 
 # # Goodbye message # #
