@@ -79,7 +79,8 @@
 # - Return the completed array
 
 # 2. Deal cards to player and dealer
-# - Create new arrays for player ahnd and dealer hand
+# - Initialize scores for player and dealer outside of the main game loop
+# - Create new arrays for player and and dealer hand
 # - Define a generic method to draw a card
 #   - Draw card: Destructively remove a hash from the deck array and add them to the current player's hand
 #   - Return value not important
@@ -125,3 +126,12 @@
 #   - Return 'Player' if the player wins
 #   - Return 'Computer' if the computer wins
 #   - Otherwise, return a tie message
+# - Add 1 to the winner's score
+
+# - Display dealer and player scores
+# - Display final winner
+# - Play again?
+
+# # Bonus Feature Notes
+
+# In the LS solution, the third call to play_again? is different because it is on the last line of the loop. The first two precede code within the same loop, so we need to skip to the next iteration (`next`) if the player wants to start again from the top of the main game loop, or `break` out of the loop completely if the player is done playing. We only need the option to break or not when we ask on the last line, since if we don't break at that point, the next iteration will automatically be evaluated.
