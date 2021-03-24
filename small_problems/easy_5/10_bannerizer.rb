@@ -72,14 +72,8 @@
 #   - Repeat the second method call
 #   - Repeat the first method call
 
-# # Further Exploration
-# - Introduce a loop into the part of the final method which prints the actual string
-#   - Using a counter, print the first 78 characters of the string
-#   - (the entire string will be printed if it is shorter than 78)
-#   - Break out of the loop if the counter has exceeded the length of the string
-#   - Increment the counter by 78
 
-TERMINAL_SIZE = 80
+
 
 def box_edge(num)
   spacer_qty = num + 2
@@ -112,14 +106,7 @@ end
 def print_in_box(str)
   box_edge(str.size)
   box_pad(str.size)
-
-  char_count = str.size + 4
-  loop do
-    box_content(str[0..char_count])
-    break if char_count <= TERMINAL_SIZE
-    char_count -= 80
-  end
-
+  box_content(str)
   box_pad(str.size)
   box_edge(str.size)
 end
@@ -128,5 +115,3 @@ print_in_box('Jack Sprats was a cat,')
 print_in_box('whose wife was made of clay.')
 print_in_box('He scrounged around, on the town')
 print_in_box('every single day.')
-
-print_in_box('Jack Sprats was a cat, whose wife was made of clay. He scrounged around, on the town, every single day.')
