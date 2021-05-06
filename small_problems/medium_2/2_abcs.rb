@@ -46,9 +46,9 @@ end
 # - Create copy of blocks hash with helper method
 # - Iterate through characters in a string
 #   - If the character is in the hash values
-#     - Set that value equal to false
+#     - Delete the block
 #   - If the character is in the hash keys and its value is truthy
-#     - set the value to false
+#     - Delete the block
 #   - Otherwise,
 #     - return false
 # - Return true (meaning all characters have been found in the hash keys or values without invalid blocks being accessed)

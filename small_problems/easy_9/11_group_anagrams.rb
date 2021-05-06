@@ -34,6 +34,7 @@ Algorithm
 
 def anagrams(arr)
   all_subsets = []
+  
   arr.each do |top_word|
     current_subset = arr.select do |inner_word|
       top_word.chars.sort == inner_word.chars.sort
